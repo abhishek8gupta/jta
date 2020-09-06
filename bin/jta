@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# java -jar jta.jar $@
+java -jar ../build/libs/jta-1.0-SNAPSHOT.jar $@

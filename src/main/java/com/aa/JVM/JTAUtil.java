@@ -31,7 +31,7 @@ public class JTAUtil {
         writer.printf("|%1$50s|%2$20s|%3$20s|%4$10s|%5$10s|%6$10s|%7$5s|%8$50s|\n", "Name", "STATE", "TID", "NID", "PRIO", "OS-PRIOR", "SEQ", "DETAILS");
         writer.printf("+%3$50s+%1$20s+%1$20s+%2$10s+%2$10s+%2$10s+%4$5s+%3$50s+\n", s20,  s10, s50, s5);
         for(ThreadStack ts : newList) {
-            writer.printf("|%1$50s|%2$20s|%3$20s|%4$10s|%5$10s|%6$10s||%7$5s|%8$50s|\n", ts.getTname(), ts.getState(), ts.getTid(), ts.getNid(), ts.getPriority(), ts.getOSPriority(), ts.getSequence(), ts.getThreadType());
+            writer.printf("|%1$50s|%2$20s|%3$20s|%4$10s|%5$10s|%6$10s|%7$5s|%8$50s|\n", ts.getTname(), ts.getState(), ts.getTid(), ts.getNid(), ts.getPriority(), ts.getOSPriority(), ts.getSequence(), ts.getThreadType());
         }
         writer.printf("+%3$50s+%1$20s+%1$20s+%2$10s+%2$10s+%2$10s+%4$5s+%3$50s+\n", s20,  s10, s50,s5);
         writer.flush();
