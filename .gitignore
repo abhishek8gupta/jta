@@ -1,0 +1,15 @@
+.idea
+**/.gradle
+**/build
+**/*.iml
+**/target
+**/.classpath
+**/.settings
+**/bin
+**/.project
+**/classes
+**/out/*
+**/.DS_Store
+**/*000*
+gradle*
+
