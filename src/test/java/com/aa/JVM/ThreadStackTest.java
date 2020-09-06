@@ -18,7 +18,7 @@ public class ThreadStackTest {
 
     @Test
     public void threadDumpTest(){
-        ThreadDump td = new ThreadDump(stack);
+        ThreadDump td = new ThreadDump(stack, null);
         System.out.println("stack: " + td.toString());
         td.print();
         Assert.assertNotNull(td);

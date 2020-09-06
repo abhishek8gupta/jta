@@ -11,10 +11,6 @@ import java.util.StringJoiner;
 
 public class JTAUtil {
     private static PrintWriter writer = new PrintWriter(System.out, true);
-    public static void printHelp(){
-        writer.printf("--help\n");
-        writer.printf("[pid] process id of process to attach to\n");
-    }
 
     public static void printThreadDumpSummary(ThreadDump threadDump){
         Collection<ThreadStack> threadStackCollection = threadDump.getThreadStackMap().values();
@@ -27,11 +23,17 @@ public class JTAUtil {
         String s50 = getString("-", 50);
         writer.printf("+%1$50s+\n", s50);
         writer.printf("|%1$50s|\n", threadDump.getLocalDateTime());
+        writer.printf("|%1$50s|\n", threadDump.getFilename());
         writer.printf("+%3$50s+%1$20s+%1$20s+%2$10s+%2$10s+%2$10s+%4$5s+%3$50s+\n", s20,  s10, s50, s5);
-        writer.printf("|%1$50s|%2$20s|%3$20s|%4$10s|%5$10s|%6$10s|%7$5s|%8$50s|\n", "Name", "STATE", "TID", "NID", "PRIO", "OS-PRIOR", "SEQ", "DETAILS");
+        writer.printf("|%1$50s|%2$20s|%3$20s|%4$10s|%5$10s|%6$10s|%7$5s|%8$50s|\n", "Name", "STATE", "TID",
+            "NID", "PRIO", "OS-PRIOR", "SEQ", "DETAILS");
         writer.printf("+%3$50s+%1$20s+%1$20s+%2$10s+%2$10s+%2$10s+%4$5s+%3$50s+\n", s20,  s10, s50, s5);
         for(ThreadStack ts : newList) {
-            writer.printf("|%1$50s|%2$20s|%3$20s|%4$10s|%5$10s|%6$10s|%7$5s|%8$50s|\n", ts.getTname(), ts.getState(), ts.getTid(), ts.getNid(), ts.getPriority(), ts.getOSPriority(), ts.getSequence(), ts.getThreadType());
+            if(ts.getTid() == null) continue;
+            
+            String tname = ts.getTname().length() > 50 ? ts.getTname().substring(0, 50) : ts.getTname();
+            writer.printf("|%1$50s|%2$20s|%3$20s|%4$10s|%5$10s|%6$10s|%7$5s|%8$50s|\n", tname, ts.getState(),
+                ts.getTid(), ts.getNid(), ts.getPriority(), ts.getOSPriority(), ts.getSequence(), ts.getThreadType());
         }
         writer.printf("+%3$50s+%1$20s+%1$20s+%2$10s+%2$10s+%2$10s+%4$5s+%3$50s+\n", s20,  s10, s50,s5);
         writer.flush();
@@ -40,11 +42,11 @@ public class JTAUtil {
     public static void printStackTrace(ThreadDump td){
         PrintWriter writer = new PrintWriter(System.out, true);
         String s20 = getString("-", 20);
-        String s100 = getString("-", 100);
+        String s160 = getString("-", 160);
         String se20 = getString(" ", 20);
-        writer.printf("+%1$20s+%2$100s+\n", s20, s100);
-        writer.printf("|%1$20s|%2$100s|\n", "TID", "STACK TRACE");
-        writer.printf("+%1$20s+%2$100s+\n", s20, s100);
+        writer.printf("+%1$20s+%2$160s+\n", s20, s160);
+        writer.printf("|%1$20s|%2$160s|\n", "TID", "STACK TRACE");
+        writer.printf("+%1$20s+%2$160s+\n", s20, s160);
         Map<String, ThreadStack> tmap = td.getThreadStackMap();
         for(Entry<String, ThreadStack> entrySet : tmap.entrySet()){
             List<StackTraceElement> ste = entrySet.getValue().getTraceElement();
@@ -52,14 +54,18 @@ public class JTAUtil {
             int startIndex = 0;
             for(StackTraceElement se : ste){
                 sj.add(se.toString());
-                if(startIndex++ == 0) {
-                    writer.printf("|%1$20s|%2$100s|\n", entrySet.getKey(), se.toString());
-                }else{
-                    writer.printf("|%1$20s|%2$100s|\n", se20, se.toString());
+                if(startIndex == 0) {
+                    writer.printf("|%1$20s|%2$160s|\n", entrySet.getKey(), se.toString());
+                    startIndex++;
+                } else if (startIndex == 1) {
+                    writer.printf("|%1$20s|%2$160s|\n", entrySet.getValue().getState(), se.toString());
+                    startIndex++;
+                } else{
+                    writer.printf("|%1$20s|%2$160s|\n", se20, se.toString());
                 }
             }
             if(startIndex != 0) {
-                writer.printf("+%1$20s+%2$60s+\n", s20, s100);
+                writer.printf("+%1$20s+%2$160s+\n", s20, s160);
             }
         }
         writer.flush();

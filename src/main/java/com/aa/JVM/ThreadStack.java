@@ -1,8 +1,10 @@
 package com.aa.JVM;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,7 +45,12 @@ public class ThreadStack implements Comparable<ThreadStack> {
             }else if(lineNo == 1){
                 String state = StringUtils.strip(dump.get(1));
                 String[] str = state.split(":");
-                this.state = StringUtils.strip(str[1]).split(" ")[0];
+                try {
+                    this.state = StringUtils.strip(str[1]).split(" ")[0];
+                }catch(Exception ex){
+                    logger.log(Level.SEVERE, "failed to parse {0}", state);
+                    continue;
+                }
             }else {
                 traceElement.add(getStackTraceElement(dump.get(lineNo)));
             }
@@ -59,7 +66,13 @@ public class ThreadStack implements Comparable<ThreadStack> {
             otherIndex = 2;
         }
         this.tname = medataInfo[nameindex];
-        String[] otherInfo = medataInfo[otherIndex].split(" ");
+        String[] otherInfo = {};
+        try {
+            otherInfo = medataInfo[otherIndex].split(" ");
+        }catch(Exception ex){
+            logger.log(Level.SEVERE, "unable to parse {0}", medataInfo);
+            return;
+        }
 
 //        logger.info(Arrays.toString(medataInfo));
         int nidIndex = 0;
@@ -67,32 +80,37 @@ public class ThreadStack implements Comparable<ThreadStack> {
         for(int index=0; index < otherInfo.length ; index++){
             String other = otherInfo[index];
 
-            if(other.contains("#")){
-                other = StringUtils.strip(other, "#");
-                other = StringUtils.trim(other);
-                this.sequence = Integer.parseInt(other);
+            try {
+                if (other.contains("#")) {
+                    other = StringUtils.strip(other, "#");
+                    other = StringUtils.trim(other);
+                    this.sequence = Integer.parseInt(other);
+                    continue;
+                }
+
+                if (other.contains("prio")) {
+                    this.priority = getValue(other);
+                }
+
+                if (other.contains("os_prio")) {
+                    this.OSPriority = getValue(other);
+                }
+
+                if (other.contains("tid")) {
+                    this.tid = getValue(other);
+                }
+
+                if (other.contains("nid")) {
+                    this.nid = getValue(other);
+                    nidIndex = index;
+                }
+
+                if (nidIndex != 0 && index > nidIndex && index < otherInfo.length - 1) {
+                    sj.add(other);
+                }
+            }catch(Exception ex){
+                logger.log(Level.SEVERE, "failed to pasrse {0}", other);
                 continue;
-            }
-
-            if(other.contains("prio")){
-                this.priority = getValue(other);
-            }
-
-            if(other.contains("os_prio")){
-                this.OSPriority = getValue(other);
-            }
-
-            if(other.contains("tid")){
-                this.tid = getValue(other);
-            }
-
-            if(other.contains("nid")){
-                this.nid = getValue(other);
-                nidIndex = index;
-            }
-
-            if(nidIndex!= 0 && index > nidIndex && index < otherInfo.length - 1){
-                sj.add(other);
             }
         }
 

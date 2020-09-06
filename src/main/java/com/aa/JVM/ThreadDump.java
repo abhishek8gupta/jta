@@ -6,17 +6,23 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 
 public class ThreadDump {
+    private static Logger logger = Logger.getLogger("com.JVM.ThreadDump");
     private LocalDateTime localDateTime;
     private long timestampMillis;
     private Map<String, ThreadStack> threadStackMap;
     private Map<String, ThreadStack> blockedThreadStackMap;
     private String infoStr;
+    private String filename;
 
-    ThreadDump(String dumpStr){
+    ThreadDump(String dumpStr, String filename){
         threadStackMap = new HashMap<>();
+        blockedThreadStackMap = new HashMap<>();
+        this.filename = filename;
         String [] strSplit = dumpStr.split("\n\n");
         int index = 0;
         String threadMetaInfo = "";
@@ -76,6 +82,10 @@ public class ThreadDump {
 
     public String getInfoStr() {
         return infoStr;
+    }
+
+    public String getFilename() {
+        return filename;
     }
 
     @Override

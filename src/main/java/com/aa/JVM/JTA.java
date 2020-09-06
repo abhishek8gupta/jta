@@ -4,6 +4,7 @@ import com.sun.tools.attach.VirtualMachine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sun.tools.attach.HotSpotVirtualMachine;
@@ -12,19 +13,31 @@ public class JTA {
     private static Logger logger = Logger.getLogger("com.JVM");
 
     public static void main(String[] args){
-        int length = args.length;
-        if(length < 1){
-            logger.log(Level.SEVERE, "invalid command line arguments {0}", Arrays.toString(args));
-            logger.log(Level.INFO, "length {0}", length);
-            JTAUtil.printHelp();
-            return;
+        JTA jta = new JTA();
+        ArgumentParser argumentParser = new ArgumentParser(args);
+
+        logger.log(Level.INFO, "command line arguments {0}", Arrays.toString(args));
+
+        String pid = argumentParser.getPid();
+        if(pid != null){
+            jta.getThreadDumpFromPid(pid);
+        }else if(null != argumentParser.getInputFolderPath()){
+            ThreadDumpFileHandler threadDumpFileHandler = new ThreadDumpFileHandler(argumentParser.getInputFolderPath(), null);
+            List<ThreadDump> threadDumpList = threadDumpFileHandler.getThreadDumpList();
+            for(ThreadDump td: threadDumpList){
+                td.print();
+                td.printStackTrace();
+            }
+        }else{
+            logger.log(Level.INFO, "Nothing to do!  with what you specified {0}", Arrays.toString(args));
         }
 
-        logger.log(Level.INFO, "invalid command line arguments {0}", Arrays.toString(args));
-        int pid = Integer.parseInt(args[0]);
+    }
+
+    public void getThreadDumpFromPid(String pid){
         VirtualMachine vm = null;
         try {
-            vm = VirtualMachine.attach(args[0]);
+            vm = VirtualMachine.attach(pid);
         } catch (Exception x) {
             String msg = x.getMessage();
             if (msg != null) {
@@ -39,7 +52,7 @@ public class JTA {
 
         try {
             HotSpotVirtualMachine hvm = (HotSpotVirtualMachine) vm;
-            InputStream in = hvm.remoteDataDump((Object[]) args);
+            InputStream in = hvm.remoteDataDump((Object[]) params);
             // read to EOF and just print output
             byte b[] = new byte[256];
             int n;
@@ -55,7 +68,7 @@ public class JTA {
             } while (n > 0);
             in.close();
             vm.detach();
-            ThreadDump td = new ThreadDump(sb.toString());
+            ThreadDump td = new ThreadDump(sb.toString(), null);
             td.print();
             td.printStackTrace();
         }catch(IOException ex){
