@@ -48,7 +48,7 @@ public class ThreadStack implements Comparable<ThreadStack> {
                 try {
                     this.state = StringUtils.strip(str[1]).split(" ")[0];
                 }catch(Exception ex){
-                    logger.log(Level.SEVERE, "failed to parse {0}", state);
+//                    logger.log(Level.SEVERE, "failed to parse {0}", state);
                     continue;
                 }
             }else {
@@ -86,7 +86,7 @@ public class ThreadStack implements Comparable<ThreadStack> {
         try {
             otherInfo = medataInfo[otherIndex].split(" ");
         }catch(Exception ex){
-            logger.log(Level.SEVERE, "unable to parse {0}", medataInfo);
+//            logger.log(Level.SEVERE, "unable to parse {0}", medataInfo);
             return;
         }
 

@@ -89,7 +89,8 @@ public class ThreadDump {
     }
 
     public void printSummary(){
-
+        ThreadDumpSummary summary = new ThreadDumpSummary(getThreadStackMap());
+        summary.printSummary();
     }
 
     @Override

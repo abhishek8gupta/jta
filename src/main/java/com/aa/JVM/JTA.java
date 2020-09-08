@@ -19,24 +19,35 @@ public class JTA {
         logger.log(Level.INFO, "command line arguments {0}", Arrays.toString(args));
 
         String pid = argumentParser.getPid();
+        ThreadDumpFileHandler threadDumpFileHandler = new ThreadDumpFileHandler(argumentParser.getInputFolderPath(), argumentParser.getOutputFolderPath());
         if(pid != null){
-            jta.getThreadDumpFromPid(pid);
+            ThreadDump td = jta.getThreadDumpFromPid(pid, threadDumpFileHandler);
+            jta.output(argumentParser, td);
         }else if(null != argumentParser.getInputFolderPath()){
-            ThreadDumpFileHandler threadDumpFileHandler = new ThreadDumpFileHandler(argumentParser.getInputFolderPath(), null);
+            threadDumpFileHandler.processInputFiles();
             List<ThreadDump> threadDumpList = threadDumpFileHandler.getThreadDumpList();
             for(ThreadDump td: threadDumpList){
-                ThreadDumpSummary summary = new ThreadDumpSummary(td.getThreadStackMap());
-//                td.print();
-//                td.printStackTrace();
-                summary.printSummary();
+                jta.output(argumentParser, td);
             }
         }else{
             logger.log(Level.INFO, "Nothing to do!  with what you specified {0}", Arrays.toString(args));
         }
-
     }
 
-    public void getThreadDumpFromPid(String pid){
+    private void output(ArgumentParser argumentParser, ThreadDump td){
+        if(argumentParser.isSummary()){
+            td.printSummary();
+        }else if(argumentParser.isDetails()){
+            td.print();
+        }else if(argumentParser.isStacktrace()){
+            td.printStackTrace();
+        }else{
+            td.printSummary();
+        }
+    }
+
+
+    public ThreadDump getThreadDumpFromPid(String pid, ThreadDumpFileHandler threadDumpFileHandler){
         VirtualMachine vm = null;
         try {
             vm = VirtualMachine.attach(pid);
@@ -70,13 +81,15 @@ public class JTA {
             } while (n > 0);
             in.close();
             vm.detach();
-            ThreadDump td = new ThreadDump(sb.toString(), null);
-            td.print();
-            td.printStackTrace();
+            String filename = threadDumpFileHandler.writeToFile(sb.toString());
+            ThreadDump td = new ThreadDump(sb.toString(), filename);
+            return td;
         }catch(IOException ex){
             ex.printStackTrace();
             System.exit(1);
         }
+
+        return null;
 
     }
 

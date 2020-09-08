@@ -12,6 +12,9 @@ public class ArgumentParser {
     private String pid;
     private String inputFolderPath;
     private String outputFolderPath;
+    private boolean summary = false;
+    private boolean details = false;
+    private boolean stacktrace = false;
 
     public ArgumentParser(String[] args){
         Options options = new Options();
@@ -27,6 +30,18 @@ public class ArgumentParser {
         Option processid = new Option("p", "pid", true, "jvm process id (mandatory if input file path is not specified)");
         output.setRequired(true);
         options.addOption(processid);
+
+        Option summary = new Option("s", "summary", false, "summary of thread dump");
+        output.setRequired(false);
+        options.addOption(summary);
+
+        Option details = new Option("d", "details", false, "details of thread dump");
+        output.setRequired(false);
+        options.addOption(details);
+
+        Option stacktrace = new Option("st", "stacktrace", false, "stacktrace of thread dump");
+        output.setRequired(false);
+        options.addOption(stacktrace);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -56,6 +71,10 @@ public class ArgumentParser {
         if(cmd.hasOption("o")) {
             outputFolderPath = cmd.getOptionValue("output");
         }
+
+        this.summary = cmd.hasOption("s");
+        this.details = cmd.hasOption("d");
+        this.stacktrace = cmd.hasOption("st");
     }
 
     public String getPid() {
@@ -70,6 +89,17 @@ public class ArgumentParser {
         return outputFolderPath;
     }
 
+    public boolean isSummary() {
+        return summary;
+    }
+
+    public boolean isDetails() {
+        return details;
+    }
+
+    public boolean isStacktrace() {
+        return stacktrace;
+    }
 
     boolean isValidOption(CommandLine cmd){
         if(cmd.getOptions().length == 0){
