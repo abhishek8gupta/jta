@@ -88,6 +88,10 @@ public class ThreadDump {
         return filename;
     }
 
+    public void printSummary(){
+
+    }
+
     @Override
     public String toString() {
         return "ThreadDump{" +

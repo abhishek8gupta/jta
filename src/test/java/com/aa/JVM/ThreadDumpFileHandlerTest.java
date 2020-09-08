@@ -7,10 +7,12 @@ import org.junit.Test;
 public class ThreadDumpFileHandlerTest {
     @Test
     public void threadDumpFileHandlerTest(){
-        ThreadDumpFileHandler threadDumpFileHandler = new ThreadDumpFileHandler("/Users/abhigup4/Downloads/threaddump", null);
+        ThreadDumpFileHandler threadDumpFileHandler = new ThreadDumpFileHandler("/tmp/threaddump", null);
         List<ThreadDump> threadDumpList = threadDumpFileHandler.getThreadDumpList();
         for(ThreadDump td: threadDumpList){
             td.print();
+            ThreadDumpSummary summary = new ThreadDumpSummary(td.getThreadStackMap());
+            summary.printSummary();
         }
         Assert.assertNotNull(threadDumpFileHandler);
     }

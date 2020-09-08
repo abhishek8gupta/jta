@@ -30,7 +30,7 @@ public class JTAUtil {
         writer.printf("+%3$50s+%1$20s+%1$20s+%2$10s+%2$10s+%2$10s+%4$5s+%3$50s+\n", s20,  s10, s50, s5);
         for(ThreadStack ts : newList) {
             if(ts.getTid() == null) continue;
-            
+
             String tname = ts.getTname().length() > 50 ? ts.getTname().substring(0, 50) : ts.getTname();
             writer.printf("|%1$50s|%2$20s|%3$20s|%4$10s|%5$10s|%6$10s|%7$5s|%8$50s|\n", tname, ts.getState(),
                 ts.getTid(), ts.getNid(), ts.getPriority(), ts.getOSPriority(), ts.getSequence(), ts.getThreadType());
@@ -69,6 +69,33 @@ public class JTAUtil {
             }
         }
         writer.flush();
+    }
+
+    public static void printSummary(ThreadDumpSummary summary){
+        String s20 = getString("-", 20);
+        writer.printf("+%1$20s+%1$20s+\n", s20);
+        writer.printf("|%1$20s|%2$20s|\n", "GROUP", "COUNT");
+        writer.printf("+%1$20s+%1$20s+\n", s20);
+        for(Entry entry : summary.getGroupCount().entrySet()){
+            int count = (int)entry.getValue();
+            String name = (String)entry.getKey();
+            writer.printf("|%1$20s|%2$20s|\n", name, count);
+        }
+        writer.printf("+%1$20s+%1$20s+\n\n\n", s20);
+
+        writer.printf("+%1$20s+%1$20s+\n", s20);
+        writer.printf("|%1$20s|%2$20s|\n", "STATE", "COUNT");
+        writer.printf("+%1$20s+%1$20s+\n", s20);
+        int total = 0;
+        for(Entry entry : summary.getStateCount().entrySet()){
+            int count = (int)entry.getValue();
+            String state = (String)entry.getKey();
+            writer.printf("|%1$20s|%2$20s|\n", state, count);
+            total += count;
+        }
+        writer.printf("+%1$20s+%1$20s+\n", s20);
+        writer.printf("|%1$20s|%2$20s|\n", "TOTAL", summary.getTotalCount());
+        writer.printf("+%1$20s+%1$20s+\n", s20);
     }
 
     private static String getString(String s, int len){

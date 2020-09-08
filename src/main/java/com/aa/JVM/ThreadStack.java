@@ -59,13 +59,29 @@ public class ThreadStack implements Comparable<ThreadStack> {
 
     void readMetaInformation(String metaString){
         String[] medataInfo = metaString.split("\"");
+        String threadname = "";
+        if(medataInfo.length > 1 && StringUtils.isBlank(medataInfo[0]) && medataInfo[1].contains("tid")){
+//            logger.log(Level.SEVERE, "tname empty medataInfo {0}", metaString);
+            int index = metaString.indexOf("#");
+            threadname = metaString.substring(0, index);
+            String remaining = metaString.substring(index);
+            medataInfo = remaining.split("\"");
+        }
         int nameindex = 0;
         int otherIndex = 1;
         if(medataInfo.length > 2){
             nameindex = 1;
             otherIndex = 2;
         }
-        this.tname = medataInfo[nameindex];
+        if(!StringUtils.isBlank(threadname)) {
+            this.tname = threadname;
+            otherIndex = 0;
+        }else {
+            this.tname = medataInfo[nameindex];
+        }
+        if(StringUtils.isBlank(tname)){
+            logger.log(Level.SEVERE, "tname empty medataInfo {0}", metaString);
+        }
         String[] otherInfo = {};
         try {
             otherInfo = medataInfo[otherIndex].split(" ");

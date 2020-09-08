@@ -25,8 +25,10 @@ public class JTA {
             ThreadDumpFileHandler threadDumpFileHandler = new ThreadDumpFileHandler(argumentParser.getInputFolderPath(), null);
             List<ThreadDump> threadDumpList = threadDumpFileHandler.getThreadDumpList();
             for(ThreadDump td: threadDumpList){
-                td.print();
-                td.printStackTrace();
+                ThreadDumpSummary summary = new ThreadDumpSummary(td.getThreadStackMap());
+//                td.print();
+//                td.printStackTrace();
+                summary.printSummary();
             }
         }else{
             logger.log(Level.INFO, "Nothing to do!  with what you specified {0}", Arrays.toString(args));
