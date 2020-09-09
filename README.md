@@ -4,7 +4,8 @@ Java Thread Analyzer(JTA) tool can be useful in analyzing thread dumps of a java
 ### Usage
 
 ```
-╰─➤  ./jta                                                                                                                                                                                                                                                             1 ↵
+cd bin
+./jta                                                                                                                                                                                                                                                             1 ↵
 usage: jta
  -d,--details        details of thread dump
  -i,--input <arg>    input file path (mandatory if PID is not specified)
